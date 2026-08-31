@@ -3,12 +3,13 @@ import { NodeResizer } from 'reactflow';
 
 // #COMPONENT
 export default function ChapterNode({ data, selected }: { data: any, selected: boolean }) {
+  // #RENDER
   return (
     <>
-      <NodeResizer color="#ff0071" isVisible={selected} minWidth={300} minHeight={300} />
-      <div className="bg-slate-100/50 border-2 border-dashed border-slate-400 rounded-xl w-full h-full -z-10 relative">
-        <div className="absolute top-0 left-0 bg-slate-400 text-white px-4 py-1 rounded-br-xl rounded-tl-xl font-bold text-sm">
-          {data.label}
+      <NodeResizer color="#cbd5e1" isVisible={selected} minWidth={400} minHeight={300} />
+      <div className="bg-transparent border border-gray-300 rounded-lg w-full h-full -z-10 relative mt-3">
+        <div className="absolute -top-3 left-0 bg-white border border-gray-300 text-gray-900 px-3 py-1 rounded-md text-sm font-medium">
+          {data.label || 'Chapter'}
         </div>
       </div>
     </>

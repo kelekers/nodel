@@ -2,7 +2,12 @@
 
 // #IMPORTS
 import React, { useMemo } from 'react';
-import ReactFlow, { Controls, Background, Panel } from 'reactflow';
+import ReactFlow, { 
+  Controls, 
+  Background, 
+  Panel,
+  BackgroundVariant 
+} from 'reactflow';
 import useStore from '../store/useStore';
 import StoryNode from '../components/nodes/StoryNode';
 import CharacterNode from '../components/nodes/CharacterNode';
@@ -26,9 +31,15 @@ export default function NodelCanvas() {
     chapter: ChapterNode,
   }), []);
 
+  // #DEFAULT_EDGE_OPTIONS
+  const defaultEdgeOptions = {
+    style: { stroke: '#9ca3af', strokeWidth: 2 },
+    type: 'default',
+  };
+
   // #RENDER
   return (
-    <div className="w-screen h-screen flex bg-gray-50">
+    <div className="w-screen h-screen flex bg-gray-50/50">
       <Sidebar />
       <div className="flex-1 relative">
         <ReactFlow
@@ -38,14 +49,20 @@ export default function NodelCanvas() {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           nodeTypes={nodeTypes}
+          defaultEdgeOptions={defaultEdgeOptions}
           fitView
         >
-          <Background color="#ccc" gap={16} />
+          <Background 
+            variant={BackgroundVariant.Dots} 
+            gap={20} 
+            size={1} 
+            color="#d1d5db" 
+          />
           <Controls />
           <Panel position="top-right">
             <button
               onClick={autoLayout}
-              className="bg-gray-800 text-white px-4 py-2 rounded-md shadow-md hover:bg-gray-700 font-medium text-sm"
+              className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm hover:bg-gray-50 font-medium text-sm transition-colors"
             >
               Auto Tidy Up
             </button>
