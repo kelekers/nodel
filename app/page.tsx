@@ -1,76 +1,57 @@
 "use client";
 
 // #IMPORTS
-import React, { useState, useCallback } from 'react';
-import ReactFlow, {
-  Controls,
-  Background,
-  applyNodeChanges,
-  applyEdgeChanges,
-  addEdge,
-  Node,
-  Edge,
-  NodeChange,
-  EdgeChange,
-  Connection
-} from 'reactflow';
-
-// #INITIAL_DATA
-const initialNodes: Node[] = [
-  {
-    id: '1',
-    position: { x: 250, y: 100 },
-    data: { label: 'Start Chapter' },
-    type: 'input',
-  },
-  {
-    id: '2',
-    position: { x: 250, y: 250 },
-    data: { label: 'First Scene' },
-  },
-];
-
-const initialEdges: Edge[] = [
-  { id: 'e1-2', source: '1', target: '2' },
-];
+import React, { useMemo } from 'react';
+import ReactFlow, { Controls, Background, Panel } from 'reactflow';
+import useStore from '../store/useStore';
+import StoryNode from '../components/nodes/StoryNode';
+import CharacterNode from '../components/nodes/CharacterNode';
+import ChapterNode from '../components/nodes/ChapterNode';
+import Sidebar from '../components/Sidebar';
 
 // #MAIN_COMPONENT
 export default function NodelCanvas() {
-  
   // #STATE
-  const [nodes, setNodes] = useState<Node[]>(initialNodes);
-  const [edges, setEdges] = useState<Edge[]>(initialEdges);
+  const nodes = useStore((state) => state.nodes);
+  const edges = useStore((state) => state.edges);
+  const onNodesChange = useStore((state) => state.onNodesChange);
+  const onEdgesChange = useStore((state) => state.onEdgesChange);
+  const onConnect = useStore((state) => state.onConnect);
+  const autoLayout = useStore((state) => state.autoLayout);
 
-  // #HANDLERS
-  const onNodesChange = useCallback(
-    (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
-    []
-  );
-
-  const onEdgesChange = useCallback(
-    (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    []
-  );
-
-  const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    []
-  );
+  // #NODE_TYPES
+  const nodeTypes = useMemo(() => ({
+    story: StoryNode,
+    character: CharacterNode,
+    chapter: ChapterNode,
+  }), []);
 
   // #RENDER
   return (
-    <div className="w-screen h-screen">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        fitView
-      >
-        <Background />
-        <Controls />
-      </ReactFlow>
+    <div className="w-screen h-screen flex bg-gray-50">
+      <Sidebar />
+      <div className="flex-1 relative">
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          nodeTypes={nodeTypes}
+          fitView
+        >
+          <Background color="#ccc" gap={16} />
+          <Controls />
+          <Panel position="top-right">
+            <button
+              onClick={autoLayout}
+              className="bg-gray-800 text-white px-4 py-2 rounded-md shadow-md hover:bg-gray-700 font-medium text-sm"
+            >
+              Auto Tidy Up
+            </button>
+          </Panel>
+        </ReactFlow>
+      </div>
     </div>
   );
 }
