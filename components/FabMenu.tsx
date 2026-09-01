@@ -41,7 +41,7 @@ export default function FabMenu() {
       </button>
 
       {isFabOpen && (
-        <div className="absolute top-full right-0 mt-2 flex flex-col gap-1 items-end bg-white p-1.5 rounded-xl shadow-sm border border-gray-200 w-max">
+        <div className="absolute top-full right-0 mt-2 flex flex-col gap-1 items-end bg-white p-1.5 rounded-xl shadow-sm border border-gray-200 w-[300%]">
           <button 
             onClick={() => handleAddNode('story', 'New Scene')}
             className="flex items-center gap-3 w-full px-3 py-1.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors text-sm hover:font-semibold"
