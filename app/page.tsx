@@ -19,6 +19,7 @@ export default function NodelCanvas() {
   // #STATE
   const nodes = useStore((state) => state.nodes);
   const edges = useStore((state) => state.edges);
+  const activeView = useStore((state) => state.activeView);
   const onNodesChange = useStore((state) => state.onNodesChange);
   const onEdgesChange = useStore((state) => state.onEdgesChange);
   const onConnect = useStore((state) => state.onConnect);
@@ -45,35 +46,49 @@ export default function NodelCanvas() {
         
         {/* #TABS_HEADER */}
         <div className="flex items-end pl-0">
-          <div className="bg-white px-8 py-1 text-sm font-medium border border-gray-200 rounded-xl text-gray-700 mb-1 z-10 relative">
-            Sequel
+          <div className="bg-white px-8 py-1 text-sm font-medium border border-gray-200 rounded-xl text-gray-700 mb-1 z-10 relative capitalize">
+            {activeView === 'canvas' ? 'Sequel' : `${activeView} Database`}
           </div>
         </div>
 
-        {/* #CANVAS_AREA */}
-        <div className="flex-1 relative bg-[#fafafa] border border-gray-200 rounded-xl overflow-hidden">
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            nodeTypes={nodeTypes}
-            defaultEdgeOptions={defaultEdgeOptions}
-            snapToGrid={true}
-            snapGrid={[10, 10]}
-            fitView
-          >
-            <Background 
-              variant={BackgroundVariant.Dots} 
-              gap={20} 
-              size={1.2} 
-              color="#999999" 
-            />
-            <Controls />
-          </ReactFlow>
-
-          <FabMenu />
+        {/* #MAIN_AREA */}
+        <div className="flex-1 relative bg-[#fafafa] border border-gray-200 rounded-t-xl overflow-hidden">
+          
+          {activeView === 'canvas' ? (
+            <>
+              <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onConnect={onConnect}
+                nodeTypes={nodeTypes}
+                defaultEdgeOptions={defaultEdgeOptions}
+                snapToGrid={true}
+                snapGrid={[10, 10]}
+                fitView
+              >
+                <Background 
+                  variant={BackgroundVariant.Dots} 
+                  gap={20} 
+                  size={1.2} 
+                  color="#999999" 
+                />
+                <Controls />
+              </ReactFlow>
+              <FabMenu />
+            </>
+          ) : (
+            // #PLACEHOLDER_SPRINT_2
+            <div className="w-full h-full flex flex-col items-center justify-center">
+              <h2 className="text-2xl font-bold text-gray-800 capitalize mb-2">
+                {activeView} Management
+              </h2>
+              <p className="text-gray-500">
+                Tampilan database entitas akan dirender di sini pada Sprint 2.
+              </p>
+            </div>
+          )}
           
         </div>
       </div>
