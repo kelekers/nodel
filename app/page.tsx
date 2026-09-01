@@ -51,7 +51,7 @@ export default function NodelCanvas() {
         </div>
 
         {/* #CANVAS_AREA */}
-        <div className="flex-1 relative bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="flex-1 relative bg-[#fafafa] border border-gray-200 rounded-xl overflow-hidden">
           <ReactFlow
             nodes={nodes}
             edges={edges}
