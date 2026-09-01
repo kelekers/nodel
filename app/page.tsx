@@ -13,6 +13,7 @@ import CharacterNode from '../components/nodes/CharacterNode';
 import ChapterNode from '../components/nodes/ChapterNode';
 import Sidebar from '../components/Sidebar';
 import FabMenu from '../components/FabMenu';
+import EntityDashboard from '../components/EntityDashboard';
 
 // #MAIN_COMPONENT
 export default function NodelCanvas() {
@@ -79,15 +80,7 @@ export default function NodelCanvas() {
               <FabMenu />
             </>
           ) : (
-            // #PLACEHOLDER_SPRINT_2
-            <div className="w-full h-full flex flex-col items-center justify-center">
-              <h2 className="text-2xl font-bold text-gray-800 capitalize mb-2">
-                {activeView} Management
-              </h2>
-              <p className="text-gray-500">
-                Tampilan database entitas akan dirender di sini pada Sprint 2.
-              </p>
-            </div>
+            <EntityDashboard />
           )}
           
         </div>
