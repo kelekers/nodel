@@ -41,7 +41,7 @@ export default function NodelCanvas() {
     <div className="w-screen h-screen flex bg-gray-50">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col relative overflow-hidden pr-2 pt-2 pb-2">
+      <div className="flex-1 flex flex-col relative overflow-hidden pr-2 pt-2">
         
         {/* #TABS_HEADER */}
         <div className="flex items-end pl-0">
@@ -51,7 +51,7 @@ export default function NodelCanvas() {
         </div>
 
         {/* #CANVAS_AREA */}
-        <div className="flex-1 relative bg-white border border-gray-200 rounded-tr-xl rounded-b-xl overflow-hidden">
+        <div className="flex-1 relative bg-white border border-gray-200 rounded-tr-xl overflow-hidden">
           <ReactFlow
             nodes={nodes}
             edges={edges}
