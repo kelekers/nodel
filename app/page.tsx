@@ -60,13 +60,15 @@ export default function NodelCanvas() {
             onConnect={onConnect}
             nodeTypes={nodeTypes}
             defaultEdgeOptions={defaultEdgeOptions}
+            snapToGrid={true}
+            snapGrid={[10, 10]}
             fitView
           >
             <Background 
               variant={BackgroundVariant.Dots} 
               gap={20} 
-              size={1} 
-              color="#aeaeae" 
+              size={1.2} 
+              color="#999999" 
             />
             <Controls />
           </ReactFlow>

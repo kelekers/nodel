@@ -5,7 +5,7 @@ import { Handle, Position } from 'reactflow';
 export default function StoryNode({ data }: { data: any }) {
   // #RENDER
   return (
-    <div className="bg-white border border-gray-300 rounded-xl p-5 w-[320px] shadow-sm relative">
+    <div className="bg-white border border-gray-200 rounded-xl p-4 w-[320px] shadow-sm relative">
       <Handle 
         type="target" 
         position={Position.Bottom} 
@@ -20,7 +20,7 @@ export default function StoryNode({ data }: { data: any }) {
       />
       
       <div className="font-bold text-gray-900 mb-2">{data.label || 'Story Title'}</div>
-      <div className="text-sm text-gray-700 leading-relaxed mb-4">
+      <div className="text-sm text-gray-600 leading-relaxed mb-4">
         {data.content || 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et full'}
       </div>
       
