@@ -45,13 +45,13 @@ export default function NodelCanvas() {
         
         {/* #TABS_HEADER */}
         <div className="flex items-end pl-0">
-          <div className="bg-white px-6 py-2 text-sm font-medium border-t border-r border-l border-gray-200 rounded-t-xl text-gray-700 -mb-px z-10 relative">
+          <div className="bg-white px-8 py-1 text-sm font-medium border border-gray-200 rounded-xl text-gray-700 mb-1 z-10 relative">
             Sequel
           </div>
         </div>
 
         {/* #CANVAS_AREA */}
-        <div className="flex-1 relative bg-white border border-gray-200 rounded-tr-xl overflow-hidden">
+        <div className="flex-1 relative bg-white border border-gray-200 rounded-xl overflow-hidden">
           <ReactFlow
             nodes={nodes}
             edges={edges}
