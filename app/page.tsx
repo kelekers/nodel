@@ -1,7 +1,7 @@
 "use client";
 
 // #IMPORTS
-import React, { useMemo } from 'react';
+import React, { useMemo, DragEvent } from 'react';
 import ReactFlow, { 
   Controls, 
   Background, 
@@ -38,6 +38,50 @@ export default function NodelCanvas() {
     type: 'default',
   };
 
+  // #HANDLERS
+  const onDragOver = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  };
+
+  const onDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const rawData = event.dataTransfer.getData('application/nodel-entity');
+    if (!rawData) return;
+
+    const { type, entityId } = JSON.parse(rawData);
+    const targetElement = (event.target as Element).closest('.react-flow__node');
+
+    if (targetElement) {
+      const nodeId = targetElement.getAttribute('data-id');
+      const node = nodes.find(n => n.id === nodeId);
+
+      if (node) {
+        let updatedData = { ...node.data };
+
+        if (node.type === 'story') {
+          if (type === 'location') {
+            updatedData.locationId = entityId;
+          } else if (type === 'item') {
+            const currentItems = updatedData.itemIds || [];
+            if (!currentItems.includes(entityId)) {
+              updatedData.itemIds = [...currentItems, entityId];
+            }
+          }
+        } else if (node.type === 'character' && type === 'item') {
+          const currentItems = updatedData.itemIds || [];
+          if (!currentItems.includes(entityId)) {
+            updatedData.itemIds = [...currentItems, entityId];
+          }
+        }
+
+        useStore.setState((state) => ({
+          nodes: state.nodes.map((n) => (n.id === nodeId ? { ...n, data: updatedData } : n)),
+        }));
+      }
+    }
+  };
+
   // #RENDER
   return (
     <div className="w-screen h-screen flex bg-gray-50">
@@ -53,7 +97,11 @@ export default function NodelCanvas() {
         </div>
 
         {/* #MAIN_AREA */}
-        <div className="flex-1 relative bg-[#fafafa] border border-gray-200 rounded-t-xl overflow-hidden">
+        <div 
+          className="flex-1 relative bg-[#fafafa] border border-gray-200 rounded-t-xl overflow-hidden"
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+        >
           
           {activeView === 'canvas' ? (
             <>
