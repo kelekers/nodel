@@ -1,3 +1,5 @@
+"use client";
+
 // #IMPORTS
 import React, { useState } from 'react';
 import { 
@@ -8,7 +10,8 @@ import {
   ChevronDown, 
   ChevronRight, 
   File,
-  PanelLeft
+  PanelLeft,
+  Download
 } from 'lucide-react';
 import useStore from '../store/useStore';
 
@@ -20,6 +23,91 @@ export default function Sidebar() {
   const activeView = useStore((state) => state.activeView);
   const [isPrologueOpen, setIsPrologueOpen] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  // #HANDLERS
+  const handleCompileAndExport = () => {
+    // Mengambil state terbaru tanpa membuat komponen Sidebar re-render terus-menerus
+    const nodes = useStore.getState().nodes;
+    const edges = useStore.getState().edges;
+
+    const storyNodes = nodes.filter(n => n.type === 'story');
+    if (storyNodes.length === 0) {
+      alert("No story scenes found on the canvas!");
+      return;
+    }
+
+    // Membangun Adjacency List untuk menelusuri koneksi
+    const graph: Record<string, string[]> = {};
+    edges.forEach(edge => {
+      if (!graph[edge.source]) graph[edge.source] = [];
+      graph[edge.source].push(edge.target);
+    });
+
+    // Mencari node awal (Root): Node yang tidak menjadi target dari edge mana pun
+    const targets = new Set(edges.map(e => e.target));
+    const roots = storyNodes.filter(n => !targets.has(n.id));
+
+    const orderedNodes: typeof storyNodes = [];
+    
+    // Jika tidak ada garis sama sekali, urutkan saja dari atas ke bawah
+    if (roots.length === 0 && edges.length === 0) {
+      orderedNodes.push(...[...storyNodes].sort((a, b) => a.position.y - b.position.y || a.position.x - b.position.x));
+    } else {
+      // Penelusuran DFS (Depth-First Search) untuk merangkai cerita
+      const visited = new Set<string>();
+      
+      const dfs = (nodeId: string) => {
+        if (visited.has(nodeId)) return;
+        visited.add(nodeId);
+        
+        const node = nodes.find(n => n.id === nodeId);
+        if (node && node.type === 'story') {
+          orderedNodes.push(node);
+        }
+        
+        const children = graph[nodeId] || [];
+        children.forEach(childId => dfs(childId));
+      };
+
+      // Mulai dari setiap root
+      roots.forEach(root => dfs(root.id));
+      
+      // Tambahkan node yang mungkin tertinggal (tidak tersambung ke root mana pun)
+      storyNodes.forEach(n => {
+        if (!visited.has(n.id)) dfs(n.id);
+      });
+    }
+
+    // Menghasilkan dokumen Markdown
+    let markdown = "# Compiled Story Manuscript\n\n";
+    
+    orderedNodes.forEach((node, index) => {
+      markdown += `## ${node.data.label || 'Scene ' + (index + 1)}\n\n`;
+      
+      // Membersihkan tag HTML dari Quill menjadi teks murni
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = node.data.content || '';
+      
+      // Tambahkan line-break agar paragraf terbaca rapi
+      const textContent = Array.from(tempDiv.childNodes)
+        .map(node => node.textContent?.trim() || '')
+        .filter(text => text.length > 0)
+        .join('\n\n');
+        
+      markdown += textContent + "\n\n---\n\n";
+    });
+
+    // Memicu unduhan file
+    const blob = new Blob([markdown], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'My_Nodel_Story.md';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   // #RENDER
   return (
@@ -101,10 +189,11 @@ export default function Sidebar() {
             </button>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-t-xl rounded-b-none p-4 shadow-sm flex flex-col flex-1 overflow-y-auto">
+          {/* #CHAPTERS_&_EXPORT */}
+          <div className="bg-white border border-gray-200 rounded-t-xl rounded-b-none p-4 shadow-sm flex flex-col flex-1 overflow-hidden relative">
             <h2 className="text-md font-bold text-gray-800 mb-3 px-2">Chapter</h2>
             
-            <div className="flex flex-col">
+            <div className="flex flex-col flex-1 overflow-y-auto pb-16">
               <div 
                 className="flex items-center gap-2 px-2 py-1.5 cursor-pointer hover:bg-gray-50 rounded-md text-sm text-gray-700 font-semibold"
                 onClick={() => setIsPrologueOpen(!isPrologueOpen)}
@@ -127,18 +216,6 @@ export default function Sidebar() {
                     <File className="w-3.5 h-3.5" />
                     <span>Valley of ashes</span>
                   </div>
-                  <div className="flex items-center gap-2 px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md cursor-pointer">
-                    <File className="w-3.5 h-3.5" />
-                    <span>The first party</span>
-                  </div>
-                  <div className="flex items-center gap-2 px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md cursor-pointer">
-                    <File className="w-3.5 h-3.5" />
-                    <span>Valheim</span>
-                  </div>
-                  <div className="flex items-center gap-2 px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md cursor-pointer">
-                    <File className="w-3.5 h-3.5" />
-                    <span>Last supper</span>
-                  </div>
                 </div>
               )}
 
@@ -147,6 +224,18 @@ export default function Sidebar() {
                 <span>Epilogue</span>
               </div>
             </div>
+
+            {/* #EXPORT_BUTTON */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-white/90 border-t border-gray-100">
+              <button 
+                onClick={handleCompileAndExport}
+                className="flex items-center justify-center gap-2 w-full bg-[#f97316] text-white px-4 py-2.5 rounded-lg shadow-sm hover:bg-[#ea580c] transition-colors text-sm font-semibold"
+              >
+                <Download className="w-4 h-4" />
+                <span>Compile & Export</span>
+              </button>
+            </div>
+
           </div>
         </>
       )}

@@ -4,6 +4,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Trash2, Save, Image as ImageIcon, X, Plus } from 'lucide-react';
 import useStore from '../store/useStore';
+import dynamic from 'next/dynamic';
+import 'react-quill-new/dist/quill.snow.css';
+const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+
 
 // #COMPONENT
 export default function EntityEditor() {
@@ -234,15 +238,17 @@ export default function EntityEditor() {
 
         <div className="h-px w-full bg-gray-100 my-2" />
 
-        {/* #MAIN_CONTENT */}
+        {/* #MAIN_CONTENT_WITH_RICH_TEXT */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-gray-800">Content / Notes</label>
-          <textarea 
-            value={formData.content}
-            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-            className="w-full px-4 py-4 border border-gray-200 rounded-xl text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#f97316]/20 focus:border-[#f97316] transition-all min-h-[300px] resize-y leading-relaxed"
-            placeholder="Write backstory, detailed lore, or extended notes here..."
-          />
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#f97316]/20 focus-within:border-[#f97316] transition-all [&_.ql-toolbar]:border-none [&_.ql-toolbar]:border-b [&_.ql-toolbar]:border-gray-200 [&_.ql-toolbar]:bg-gray-50 [&_.ql-container]:border-none [&_.ql-editor]:min-h-[300px] [&_.ql-editor]:text-base [&_.ql-editor]:text-gray-700 [&_.ql-editor.ql-blank::before]:text-gray-300">
+            <ReactQuill 
+              theme="snow"
+              value={formData.content || ''}
+              onChange={(value) => setFormData({ ...formData, content: value })}
+              placeholder="Write backstory, detailed lore, or extended notes here..."
+            />
+          </div>
         </div>
 
         <div className="h-px w-full bg-gray-100 my-2" />
