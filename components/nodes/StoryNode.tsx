@@ -3,7 +3,7 @@
 // #IMPORTS
 import React from 'react';
 import { Handle, Position } from 'reactflow';
-import { MapPin, Briefcase, X, Trash2, ToolCase} from 'lucide-react';
+import { MapPin, X, Trash2, ToolCase, GripVertical } from 'lucide-react';
 import useStore from '../../store/useStore';
 import dynamic from 'next/dynamic';
 import 'react-quill-new/dist/quill.bubble.css';
@@ -42,62 +42,55 @@ export default function StoryNode({ id, data }: { id: string; data: any }) {
 
   // #RENDER
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 w-[360px] shadow-sm relative group hover:border-[#f97316]/50 transition-colors">
-      
-      {/* #DELETE_NODE_BUTTON */}
-      <button 
-        onClick={handleDeleteNode}
-        className="nodrag absolute -top-3 -right-3 bg-white border border-gray-200 text-gray-400 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all z-30 hover:bg-red-50 hover:text-red-500 hover:border-red-200 shadow-sm"
-        title="Delete Scene"
-      >
-        <Trash2 className="w-4 h-4" />
-      </button>
+    <div className="bg-white border border-gray-200 rounded-xl w-[360px] shadow-sm relative group hover:border-[#f97316]/50 transition-colors">
 
-      {/* #NODE_HANDLES */}
-      <Handle 
-        type="target" 
-        position={Position.Bottom} 
-        id="entity-in" 
-        className="w-full h-full absolute inset-0 opacity-0 rounded-xl border-none bg-transparent z-0" 
-      />
+      {/* #CONNECTION_HANDLES */}
       <Handle 
         type="target" 
         position={Position.Left} 
         id="story-in" 
-        className="w-4 h-4 bg-white border-2 border-[#f97316] rounded-full cursor-crosshair z-20 hover:scale-125 transition-transform shadow-sm" 
+        className="!w-4 !h-4 !bg-white !border-2 !border-gray-300 !rounded-full cursor-crosshair z-20 -ml-1 hover:!border-[#f97316] transition-transform shadow-sm" 
       />
       <Handle 
         type="source" 
         position={Position.Right} 
         id="story-out" 
-        className="w-4 h-4 bg-white border-2 border-[#f97316] rounded-full cursor-crosshair z-20 hover:scale-125 transition-transform shadow-sm" 
+        className="!w-4 !h-4 !bg-white !border-2 !border-gray-300 !rounded-full cursor-crosshair z-20 -mr-1 hover:!border-[#f97316] transition-transform shadow-sm" 
       />
-      
-      {/* #INLINE_EDITOR */}
-      <div className="relative z-10 flex flex-col gap-2 mb-4">
+
+      {/* #DRAG_HANDLE_HEADER */}
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-100 cursor-grab active:cursor-grabbing rounded-t-xl">
+        <GripVertical className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />
         <input 
           type="text"
           value={data.label || ''}
           onChange={handleTitleChange}
           placeholder="Scene Title..."
-          className="nodrag font-bold text-gray-900 text-lg bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-[#f97316]/30 rounded px-1 -ml-1 placeholder:text-gray-300"
+          className="nodrag flex-1 font-bold text-gray-900 text-sm bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-[#f97316]/30 rounded px-1 placeholder:text-gray-300"
         />
-        
-        {/* #RICH_TEXT_BUBBLE */}
-        <div className="nodrag w-full -ml-3 [&_.ql-editor]:px-2 [&_.ql-editor]:py-1 [&_.ql-editor]:min-h-[80px] [&_.ql-editor]:text-sm [&_.ql-editor]:text-gray-600 [&_.ql-editor]:leading-relaxed [&_.ql-tooltip]:z-50 [&_.ql-editor.ql-blank::before]:text-gray-300">
-          <ReactQuill 
-            theme="bubble"
-            value={data.content || ''}
-            onChange={handleContentChange}
-            placeholder="Write your story scene here... (Highlight text to format)"
-          />
-        </div>
+        <button 
+          onClick={handleDeleteNode}
+          className="nodrag text-gray-300 p-1 rounded opacity-0 group-hover:opacity-100 transition-all hover:bg-red-50 hover:text-red-500"
+          title="Delete Scene"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {/* #RICH_TEXT_BUBBLE */}
+      <div className="nodrag px-3 pt-2 [&_.ql-editor]:px-0 [&_.ql-editor]:py-1 [&_.ql-editor]:min-h-[70px] [&_.ql-editor]:text-sm [&_.ql-editor]:text-gray-600 [&_.ql-editor]:leading-relaxed [&_.ql-tooltip]:z-50 [&_.ql-editor.ql-blank::before]:text-gray-300">
+        <ReactQuill 
+          theme="bubble"
+          value={data.content || ''}
+          onChange={handleContentChange}
+          placeholder="Write your story scene here... (Highlight text to format)"
+        />
       </div>
       
-      <hr className="border-gray-100 mb-3 relative z-10" />
+      <hr className="border-gray-100 mx-3" />
       
       {/* #NESTED_ENTITIES */}
-      <div className="flex flex-col gap-2 relative z-10">
+      <div className="flex flex-col gap-2 px-3 py-3">
         
         {/* #LOCATION_SLOT */}
         <div className="flex items-center gap-2 text-xs text-gray-500 group/loc">
@@ -128,7 +121,7 @@ export default function StoryNode({ id, data }: { id: string; data: any }) {
                   <span className="truncate">{item.name}</span>
                   <button 
                     onClick={() => handleRemoveItem(item.id)}
-                    className="nodrag opacity-0 group-hover/item:opacity-100 hover:text-red-600 hover:bg-orange-200/50 rounded-full p-px transition-opacity"
+                    className="nodrag opacity-100 group-hover/item:opacity-100 hover:text-red-600 hover:bg-orange-200/50 rounded-full p-px transition-opacity"
                   >
                     <X className="w-2.5 h-2.5" />
                   </button>

@@ -1,13 +1,15 @@
 "use client";
 
 // #IMPORTS
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
   UserRound, 
   ToolCase, 
   MountainSnow, 
-  MoreHorizontal
+  MoreHorizontal,
+  Search,
+  X
 } from 'lucide-react';
 import useStore from '../store/useStore';
 import EntityEditor from './EntityEditor';
@@ -21,7 +23,32 @@ export default function EntityDashboard() {
   const selectedEntityId = useStore((state) => state.selectedEntityId);
   const setSelectedEntityId = useStore((state) => state.setSelectedEntityId);
 
-  const filteredEntities = entities.filter(e => e.type === activeView);
+  // Local state for search and filter
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+
+  // #EFFECTS
+  // Reset search and filter when switching views (e.g., from Character to Item)
+  useEffect(() => {
+    setSearchQuery('');
+    setSelectedTag(null);
+  }, [activeView]);
+
+  // #DERIVED_DATA
+  const baseEntities = entities.filter(e => e.type === activeView);
+  
+  // Extract all unique tags for the filter UI
+  const allTags = Array.from(new Set(baseEntities.flatMap(e => e.tags || []))).sort();
+
+  // Apply search and tag filters
+  const filteredEntities = baseEntities.filter(entity => {
+    const matchesSearch = entity.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (entity.description && entity.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesTag = selectedTag ? (entity.tags && entity.tags.includes(selectedTag)) : true;
+    
+    return matchesSearch && matchesTag;
+  });
 
   // #HANDLERS
   const handleAddNew = () => {
@@ -76,6 +103,59 @@ export default function EntityDashboard() {
           <Plus className="w-4 h-4" />
           <span>New</span>
         </button>
+      </div>
+
+      {/* #SEARCH_AND_FILTER */}
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-4 mb-8 items-start md:items-center justify-between">
+        {/* Search Bar */}
+        <div className="relative w-full md:max-w-xs flex-shrink-0">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input 
+            type="text" 
+            placeholder={`Search ${activeView}s...`}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-8 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#f97316]/20 focus:border-[#f97316] transition-all bg-gray-50 focus:bg-white"
+          />
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Tag Filters */}
+        {allTags.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mr-1">Filter:</span>
+            <button 
+              onClick={() => setSelectedTag(null)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                selectedTag === null 
+                  ? 'bg-gray-800 text-white border-gray-800 shadow-sm' 
+                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              All
+            </button>
+            {allTags.map(tag => (
+              <button 
+                key={tag}
+                onClick={() => setSelectedTag(tag)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                  selectedTag === tag 
+                    ? 'bg-[#fff7ed] text-[#ea580c] border-[#f97316]/30 shadow-sm' 
+                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* #GALLERY_GRID */}
@@ -150,7 +230,9 @@ export default function EntityDashboard() {
 
         {filteredEntities.length === 0 && (
           <div className="col-span-full py-12 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-100 rounded-2xl">
-            <p className="text-sm">No {activeView}s created yet.</p>
+            <p className="text-sm">
+              {searchQuery || selectedTag ? `No ${activeView}s match your search or filter.` : `No ${activeView}s created yet.`}
+            </p>
           </div>
         )}
       </div>
